@@ -1,0 +1,40 @@
+
+name: Build iOS 26 Clone
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Xcode scheme
+        run: xcodebuild -list -project iOS.xcodeproj
+
+      - name: Build for iPhone
+        run: |
+          xcodebuild \
+            -project iOS.xcodeproj \
+            -scheme iOS \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package IPA
+        run: |
+          APP_PATH="$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)"
+          test -n "$APP_PATH"
+          mkdir Payload
+          cp -R "$APP_PATH" Payload/
+          zip -qr iOS-26-clone-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: iOS-26-clone-IPA
+          path: iOS-26-clone-unsigned.ipa
