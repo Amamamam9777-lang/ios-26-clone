@@ -255,7 +255,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access required for camera";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access required for camera";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Photo library access required to save photos";
@@ -290,7 +291,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access required for camera";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access required for camera";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Photo library access required to save photos";
