@@ -173,7 +173,7 @@ struct SafariView: View {
             }
         }
         .background(Color(uiColor: .systemBackground))
-        .preferredColorScheme(.light)
+        .preferredColorScheme(.dark)
         .sheet(isPresented: $showShare) {
             if let url = model.currentTab?.webView.url { ShareSheet(items: [url]) }
         }
@@ -198,27 +198,63 @@ struct SafariView: View {
 
     private var startPage: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Favorites").font(.title2.bold()).padding(.horizontal, 20)
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 20) {
-                    ForEach(FavoritesData.list) { item in
-                        Button { model.load(item.url) } label: {
-                            VStack(spacing: 8) {
-                                RoundedRectangle(cornerRadius: 15).fill(Color(uiColor: .secondarySystemBackground)).frame(width: 60, height: 60)
-                                    .overlay(Image(systemName: item.icon).font(.title2).foregroundStyle(item.color))
-                                Text(item.name).font(.caption).foregroundStyle(.primary).lineLimit(1)
-                            }
-                        }.buttonStyle(.plain)
+            VStack(alignment: .leading, spacing: 22) {
+                HStack {
+                    Text("Start Page").font(.system(size: 15, weight: .semibold))
+                    Spacer()
+                    Button { } label: { Image(systemName: "ellipsis.circle").foregroundStyle(.secondary) }
+                }.padding(.horizontal, 18).padding(.top, 12)
+
+                VStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16).fill(Color(red: 0.22, green: 0.22, blue: 0.25))
+                        HStack(spacing: 0) {
+                            RoundedRectangle(cornerRadius: 8).fill(Color(red: 0.93, green: 0.45, blue: 0.47)).frame(width: 52, height: 78).rotationEffect(.degrees(-8)).offset(x: 9, y: 4)
+                            RoundedRectangle(cornerRadius: 8).fill(Color(red: 0.42, green: 0.47, blue: 0.95)).frame(width: 58, height: 90).offset(y: -2)
+                            RoundedRectangle(cornerRadius: 8).fill(Color(red: 0.95, green: 0.64, blue: 0.67)).frame(width: 52, height: 78).rotationEffect(.degrees(8)).offset(x: -9, y: 4)
+                        }
+                        VStack {
+                            Spacer()
+                            Text("Favourites").font(.system(size: 10, weight: .semibold)).padding(.horizontal, 8).padding(.vertical, 4).background(.ultraThinMaterial, in: Capsule())
+                            Text("Suggestions").font(.system(size: 10)).padding(.horizontal, 8).padding(.vertical, 4).background(.ultraThinMaterial, in: Capsule())
+                        }.padding(.bottom, 7)
+                    }.frame(height: 112)
+                    Text("Customise your wallpaper and sections that appear when creating new tabs.")
+                        .font(.system(size: 12)).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    Button { } label: {
+                        Text("Customise Start Page").font(.system(size: 14, weight: .semibold)).foregroundStyle(.white)
+                            .frame(maxWidth: .infinity).frame(height: 34).background(Color.blue, in: Capsule())
                     }
-                }.padding(.horizontal, 15)
-                HStack(spacing: 12) {
-                    quickButton("Bookmarks", icon: "book") { model.libraryMode = .bookmarks; model.showingLibrary = true }
-                    quickButton("History", icon: "clock") { model.libraryMode = .history; model.showingLibrary = true }
-                    quickButton("Downloads", icon: "arrow.down.circle") { model.libraryMode = .downloads; model.showingLibrary = true }
+                }.padding(14).background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 22)).padding(.horizontal, 12)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack { Text("Favourites").font(.system(size: 19, weight: .bold)); Spacer(); Button("Show All ›") { model.libraryMode = .bookmarks; model.showingLibrary = true }.font(.system(size: 12)).foregroundStyle(.blue) }.padding(.horizontal, 18)
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 18) {
+                        ForEach(FavoritesData.list) { item in
+                            Button { model.load(item.url) } label: {
+                                VStack(spacing: 6) {
+                                    RoundedRectangle(cornerRadius: 13).fill(Color(uiColor: .secondarySystemBackground)).frame(width: 52, height: 52)
+                                        .overlay(Image(systemName: item.icon).font(.system(size: 25, weight: .medium)).foregroundStyle(item.color))
+                                    Text(item.name).font(.system(size: 11)).foregroundStyle(.primary).lineLimit(1)
+                                }.frame(maxWidth: .infinity)
+                            }.buttonStyle(.plain)
+                        }
+                    }.padding(.horizontal, 12)
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Privacy Report").font(.system(size: 19, weight: .bold))
+                    HStack(spacing: 12) {
+                        Image(systemName: "hand.raised.fill").font(.system(size: 22)).foregroundStyle(.secondary)
+                        Text("Safari helps prevent trackers from profiling you as you browse.")
+                            .font(.system(size: 12)).foregroundStyle(.secondary)
+                        Spacer(minLength: 0)
+                    }.padding(14).background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 18))
                 }.padding(.horizontal, 16)
-                Spacer(minLength: 30)
-            }.padding(.top, 28)
+                Spacer(minLength: 22)
+            }.padding(.bottom, 18)
         }
+        .background(Color(uiColor: .systemBackground))
     }
 
     private func quickButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
@@ -320,13 +356,13 @@ struct FavoriteItem: Identifiable {
 struct FavoritesData {
     static let list = [
         FavoriteItem(name: "Apple", icon: "apple.logo", color: .gray, url: "apple.com"),
-        FavoriteItem(name: "Google", icon: "globe", color: .blue, url: "google.com"),
-        FavoriteItem(name: "Bing", icon: "magnifyingglass", color: .teal, url: "bing.com"),
-        FavoriteItem(name: "Wikipedia", icon: "book.fill", color: .black, url: "wikipedia.org"),
-        FavoriteItem(name: "Reddit", icon: "face.smiling.inverse", color: .orange, url: "reddit.com"),
+        FavoriteItem(name: "Yandex", icon: "y.circle.fill", color: .red, url: "yandex.com"),
+        FavoriteItem(name: "Bing", icon: "b.circle.fill", color: .cyan, url: "bing.com"),
+        FavoriteItem(name: "Google", icon: "g.circle.fill", color: .blue, url: "google.com"),
+        FavoriteItem(name: "Wikipedia", icon: "w.circle.fill", color: .gray, url: "wikipedia.org"),
         FavoriteItem(name: "YouTube", icon: "play.rectangle.fill", color: .red, url: "youtube.com"),
-        FavoriteItem(name: "X", icon: "xmark", color: .black, url: "x.com"),
-        FavoriteItem(name: "Weather", icon: "cloud.sun.fill", color: .blue, url: "weather.com")
+        FavoriteItem(name: "Reddit", icon: "r.circle.fill", color: .orange, url: "reddit.com"),
+        FavoriteItem(name: "X", icon: "xmark", color: .white, url: "x.com")
     ]
 }
 
