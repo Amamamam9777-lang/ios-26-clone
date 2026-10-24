@@ -66,6 +66,19 @@ final class SafariViewModel: ObservableObject {
         if selectedTabID == tab.id { selectedTabID = tabs.last?.id }
         if tabs.isEmpty { newTab() }
     }
+    /// Handles links passed to the app by iOS or another app.
+    func openIncomingURL(_ incomingURL: URL) {
+        if incomingURL.scheme?.lowercased() == "mybrowser",
+           incomingURL.host?.lowercased() == "open",
+           let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
+           let rawURL = components.queryItems?.first(where: { $0.name == "url" })?.value {
+            load(rawURL)
+            return
+        }
+        guard let scheme = incomingURL.scheme?.lowercased(), scheme == "http" || scheme == "https" else { return }
+        load(incomingURL.absoluteString)
+    }
+
     func load(_ input: String, in tab: BrowserTab? = nil) {
         guard let tab = tab ?? currentTab else { return }
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -188,6 +201,9 @@ struct SafariView: View {
             }
             addressText = url.absoluteString
             editingAddress = false
+        }
+        .onOpenURL { url in
+            model.openIncomingURL(url)
         }
     }
 
