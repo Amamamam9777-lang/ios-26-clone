@@ -71,8 +71,11 @@ final class SafariViewModel: ObservableObject {
         if incomingURL.scheme?.lowercased() == "mybrowser",
            incomingURL.host?.lowercased() == "open",
            let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
-           let rawURL = components.queryItems?.first(where: { $0.name == "url" })?.value {
-            load(rawURL)
+           let rawURL = components.queryItems?.first(where: { $0.name == "url" })?.value,
+           let destination = URL(string: rawURL),
+           let scheme = destination.scheme?.lowercased(),
+           scheme == "http" || scheme == "https" {
+            load(destination.absoluteString)
             return
         }
         guard let scheme = incomingURL.scheme?.lowercased(), scheme == "http" || scheme == "https" else { return }
@@ -190,20 +193,16 @@ struct SafariView: View {
         .sheet(isPresented: $showShare) {
             if let url = model.currentTab?.webView.url { ShareSheet(items: [url]) }
         }
-        // Handles an incoming HTTP/HTTPS URL when iOS routes one to this app.
-        // This handler does not grant the restricted default-browser entitlement.
-        .onOpenURL { url in
-            guard let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https" else { return }
-            if model.currentTab == nil {
-                model.newTab(url: url.absoluteString)
-            } else {
-                model.load(url.absoluteString, in: model.currentTab)
-            }
-            addressText = url.absoluteString
-            editingAddress = false
-        }
+        // Handle one incoming URL path for custom links and HTTP/HTTPS URLs
+        // that iOS actually delivers to this app. This does not by itself make
+        // the app the system default browser.
         .onOpenURL { url in
             model.openIncomingURL(url)
+            if let currentURL = model.currentTab?.urlString, !currentURL.isEmpty {
+                addressText = currentURL
+                editingAddress = false
+                addressFocused = false
+            }
         }
     }
 
